@@ -1,48 +1,60 @@
 print("[INFO]: INITIALIZING ...")
 import re
+import requests
 from time import time
 from datetime import datetime
-from asyncio import (gather, get_event_loop, sleep)
-import requests
+from asyncio import gather, get_event_loop, sleep
 from aiohttp import ClientSession
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from pyrogram import (Client, filters, idle)
+from pyrogram import Client, filters, idle
 from Python_ARQ import ARQ
-from config import bot_token, ARQ_API_KEY, LANGUAGE, api_id, api_hash, ARQ_API_BASE_URL, BOT_USERNAME, KONTOL, MEMEK
+from config import (
+    bot_token,
+    api_id,
+    api_hash,
+    ARQ_API_KEY,
+    ARQ_API_BASE_URL,
+    LANGUAGE,
+    BOT_USERNAME,
+    KONTOL,
+    MEMEK,
+)
 
 
 print("[INFO]: INITIALIZING BOT CLIENT ...")
-luna = Client(":memory:",
-              bot_token=bot_token,
-              api_id=api_id,
-              api_hash=api_hash,
+boy = Client(
+    ":memory:",
+    bot_token=bot_token,
+    api_id=6,
+    api_hash="eb06d4abfb49dc3eeb1aeb98ae0f581e",
 )
+
 bot_id = int(bot_token.split(":")[0])
-print("[INFO]: INITIALIZING ...")
 arq = None
+print("[INFO]: INITIALIZING ...")
 
 
 START_TIME = datetime.utcnow()
 START_TIME_ISO = START_TIME.replace(microsecond=0).isoformat()
 TIME_DURATION_UNITS = (
-    ('week', 60 * 60 * 24 * 7),
-    ('day', 60 * 60 * 24),
-    ('hour', 60 * 60),
-    ('min', 60),
-    ('sec', 1)
+    ("week", 60 * 60 * 24 * 7),
+    ("day", 60 * 60 * 24),
+    ("hour", 60 * 60),
+    ("min", 60),
+    ("sec", 1)
 )
 
 
 async def _human_time_duration(seconds):
     if seconds == 0:
-        return 'inf'
+        return "inf"
     parts = []
     for unit, div in TIME_DURATION_UNITS:
         amount, seconds = divmod(int(seconds), div)
         if amount > 0:
-            parts.append('{} {}{}'
+            parts.append("{} {}{}"
                          .format(amount, unit, "" if amount == 1 else "s"))
-    return ', '.join(parts)
+    return ", ".join(parts)
 
 
 async def lunaQuery(query: str, user_id: int):
@@ -61,7 +73,7 @@ async def lunaQuery(query: str, user_id: int):
     )
 
 
-async def type_and_send(message):
+async def type_and_send(message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id if message.from_user else 0
     query = message.text.strip()
@@ -83,15 +95,15 @@ async def type_and_send(message):
     await message._client.send_chat_action(chat_id, "cancel")
 
 
-@luna.on_message(filters.command(["start", f"start@{BOT_USERNAME}"]) & ~filters.edited)
-async def start(client: Client, message: Message):
+@boy.on_message(filters.command(["start", f"start@{BOT_USERNAME}"]) & filters.group & ~filters.edited)
+async def start(_, message: Message):
     start = time()
     delta_ping = time() - start
     current_time = datetime.utcnow()
     uptime_sec = (current_time - START_TIME).total_seconds()
     uptime = await _human_time_duration(int(uptime_sec))
     PM_IMG = f"{MEMEK}"
-    kontol = await client.send_video(message.chat.id, PM_IMG, 
+    kontol = await boy.send_video(message.chat.id, PM_IMG, 
         caption=f"**Time Taken:** `{delta_ping * 1000:.3f} ms`\n"
         f"**Uptime:** `{uptime}`",
         reply_markup=InlineKeyboardMarkup(
@@ -101,7 +113,7 @@ async def start(client: Client, message: Message):
                         "Channel", url="https://https://t.me/keluhkesahboy"
                     ),
                     InlineKeyboardButton(
-                        "GROUP", url="https://t.me/zzonateman"
+                        "Group", url="https://t.me/zzonateman"
                     )
                 ]
             ]
@@ -109,14 +121,14 @@ async def start(client: Client, message: Message):
     )
 
 
-@luna.on_message(
+@boy.on_message(
     ~filters.private
     & filters.text
-    & ~filters.command(["start", f"start@{BOT_USERNAME}"])
+    & ~filters.command("help")
     & ~filters.edited,
     group=69,
 )
-async def chat(_, message):
+async def chat(_, message: Message):
     if message.reply_to_message:
         if not message.reply_to_message.from_user:
             return
@@ -125,7 +137,7 @@ async def chat(_, message):
             return
     else:
         match = re.search(
-            f"[.|\n]{0,}boy[.|\n]{0,}",
+            "[.|\n]{0,}boy[.|\n]{0,}",
             message.text.strip(),
             flags=re.IGNORECASE,
         )
@@ -134,40 +146,28 @@ async def chat(_, message):
     await type_and_send(message)
 
 
-@luna.on_message(
-    filters.private
-    & ~filters.command(["start", f"start@{BOT_USERNAME}"])
-    & ~filters.edited
-)
-async def chatpm(_, message):
-    if not message.text:
-        await message.reply_text("Ufff... ignoring ....")
-        return
-    await type_and_send(message)
-
-
-@luna.on_message(filters.command(["asupan", f"asupan@{BOT_USERNAME}"]))
-async def asupan(client, message):
+@boy.on_message(filters.command(["asupan", f"asupan@{BOT_USERNAME}"]))
+async def asupan(_, message: Message):
     try:
         resp = requests.get("https://api-tede.herokuapp.com/api/asupan/ptl").json()
         results = f"{resp['url']}"
-        return await client.send_video(message.chat.id, video=results)
+        return await boy.send_video(message.chat.id, video=results)
     except Exception:
         await message.reply_text("`404 asupan videos not found`")
 
 
-@luna.on_message(filters.command(["wibu", f"wibu@{BOT_USERNAME}"]))
-async def wibu(client, message):
+@boy.on_message(filters.command(["wibu", f"wibu@{BOT_USERNAME}"]))
+async def wibu(_, message: Message):
     try:
         resp = requests.get("https://api-tede.herokuapp.com/api/asupan/wibu").json()
         results = f"{resp['url']}"
-        return await client.send_video(message.chat.id, video=results)
+        return await boy.send_video(message.chat.id, video=results)
     except Exception:
         await message.reply_text("`404 wibu not found`")
 
 
-@luna.on_message(filters.command(["truth", f"truth@{BOT_USERNAME}"]))
-async def truth(client, message):
+@boy.on_message(filters.command(["truth", f"truth@{BOT_USERNAME}"]))
+async def truth(_, message: Message):
     try:
         resp = requests.get("https://api-tede.herokuapp.com/api/truth").json()
         results = f"{resp['message']}"
@@ -176,8 +176,8 @@ async def truth(client, message):
         await message.reply_text("something went wrong...")
 
 
-@luna.on_message(filters.command(["dare", f"dare@{BOT_USERNAME}"]))
-async def dare(client, message):
+@boy.on_message(filters.command(["dare", f"dare@{BOT_USERNAME}"]))
+async def dare(_, message: Message):
     try:
         resp = requests.get("https://api-tede.herokuapp.com/api/dare").json()
         results = f"{resp['message']}"
@@ -186,14 +186,15 @@ async def dare(client, message):
         await message.reply_text("something went wrong...")
 
 
-@luna.on_message(filters.command(["chika", f"chika@{BOT_USERNAME}"]))
-async def chika(client, message):
+@boy.on_message(filters.command(["chika", f"chika@{BOT_USERNAME}"]))
+async def chika(_, message: Message):
     try:
         resp = requests.get("https://api-tede.herokuapp.com/api/chika").json()
         results = f"{resp['url']}"
-        return await client.send_video(message.chat.id, video=results)
+        return await boy.send_video(message.chat.id, video=results)
     except Exception:
         await message.reply_text("`404 chika videos not found`")
+
 
 
 async def main():
@@ -201,7 +202,7 @@ async def main():
     session = ClientSession()
     arq = ARQ(ARQ_API_BASE_URL, ARQ_API_KEY, session)
 
-    await luna.start()
+    await boy.start()
     print(
         """
     -----------------
