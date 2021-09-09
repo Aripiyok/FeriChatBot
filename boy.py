@@ -75,8 +75,8 @@ async def type_and_send(message):
         responsess = responsee.replace("Aco", f"{KONTOL}")
     else:
         responsess = responsee
-    if "Who is feri?" in responsess:
-        responsess2 = responsess.replace("Who is feri?", "Nani?👀")
+    if "Who is boy?" in responsess:
+        responsess2 = responsess.replace("Who is boy?", "Nani?👀")
     else:
         responsess2 = responsess
     await message.reply_text(responsess2)
@@ -98,10 +98,10 @@ async def start(client: Client, message: Message):
             [
                 [
                     InlineKeyboardButton(
-                        "Source", url="https://github.com/FeriEXP/FeriChatBot"
+                        "Channel", url="https://https://t.me/keluhkesahboy"
                     ),
                     InlineKeyboardButton(
-                        "GROUP", url="https://t.me/anossupport"
+                        "GROUP", url="https://t.me/zzonateman"
                     )
                 ]
             ]
@@ -125,7 +125,7 @@ async def chat(_, message):
             return
     else:
         match = re.search(
-            f"[.|\n]{0,}feri[.|\n]{0,}",
+            f"[.|\n]{0,}boy[.|\n]{0,}",
             message.text.strip(),
             flags=re.IGNORECASE,
         )
@@ -153,7 +153,7 @@ async def asupan(client, message):
         results = f"{resp['url']}"
         return await client.send_video(message.chat.id, video=results)
     except Exception:
-        await message.reply_text("`404 asupan videos not found:v`")
+        await message.reply_text("`404 asupan videos not found`")
 
 
 @luna.on_message(filters.command(["wibu", f"wibu@{BOT_USERNAME}"]))
@@ -163,7 +163,7 @@ async def wibu(client, message):
         results = f"{resp['url']}"
         return await client.send_video(message.chat.id, video=results)
     except Exception:
-        await message.reply_text("`404 wibu not found:v`")
+        await message.reply_text("`404 wibu not found`")
 
 
 @luna.on_message(filters.command(["truth", f"truth@{BOT_USERNAME}"]))
